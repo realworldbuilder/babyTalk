@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Target 'Momentary' in project 'BabyTalk'
+➜ Explicit dependency on target 'Momentary Watch App' in project 'BabyTalk'
+Target 'Momentary Watch App' in project 'BabyTalk' (no dependencies)
