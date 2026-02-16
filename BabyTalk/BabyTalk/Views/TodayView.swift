@@ -2,204 +2,330 @@ import SwiftUI
 
 struct TodayView: View {
     @Environment(LogStore.self) private var logStore
+    @Environment(ThemeManager.self) private var themeManager
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 20) {
-                    // Baby info header
-                    if let baby = logStore.babyProfile {
-                        VStack(spacing: 8) {
-                            Text(baby.name)
-                                .font(.title2)
-                                .fontWeight(.semibold)
-                            
-                            Text(baby.ageDescription)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.top)
+            ZStack {
+                themeManager.colors.background
+                    .ignoresSafeArea()
+                
+                ScrollView {
+                    VStack(spacing: BabyOpsTheme.spacingL) {
+                        dashboardHeader
+                        statusCards
+                        timelineSection
+                        quickActionButton
                     }
-                    
-                    // Summary cards
-                    let todayLog = logStore.todayLog
-                    
-                    LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: 16) {
-                        SummaryCard(
-                            title: "Feedings",
-                            count: todayLog.feedingCount,
-                            icon: "drop.fill",
-                            color: .blue
-                        )
-                        
-                        SummaryCard(
-                            title: "Sleep",
-                            count: todayLog.totalSleepMinutes,
-                            unit: "min",
-                            icon: "moon.fill",
-                            color: .purple
-                        )
-                        
-                        SummaryCard(
-                            title: "Diapers",
-                            count: todayLog.diaperCount,
-                            icon: "tshirt.fill",
-                            color: .green
-                        )
-                    }
-                    .padding(.horizontal)
-                    
-                    // Today's timeline
-                    VStack(alignment: .leading, spacing: 16) {
-                        HStack {
-                            Text("Today's Log")
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Text(Date().formatted(date: .abbreviated, time: .omitted))
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                        
-                        if todayLog.sortedEntries.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "doc.text")
-                                    .font(.system(size: 40))
-                                    .foregroundColor(.gray.opacity(0.5))
-                                
-                                Text("No entries today")
-                                    .font(.headline)
-                                    .foregroundColor(.secondary)
-                                
-                                Text("Tap the Record tab to add your first entry")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
-                                    .multilineTextAlignment(.center)
-                            }
-                            .padding(.vertical, 30)
-                        } else {
-                            LazyVStack(spacing: 12) {
-                                ForEach(todayLog.sortedEntries) { entry in
-                                    LogEntryRow(entry: entry)
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    // Quick record button
-                    NavigationLink(destination: RecordView()) {
-                        HStack {
-                            Image(systemName: "plus.circle.fill")
-                            Text("Record New Entry")
-                        }
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .cornerRadius(12)
-                    }
-                    .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.horizontal, BabyOpsTheme.spacingM)
+                    .padding(.bottom, BabyOpsTheme.spacingXL)
                 }
             }
-            .navigationTitle("Today")
+            .navigationTitle("Mission Control")
+            .navigationBarTitleDisplayMode(.large)
+            .toolbarBackground(themeManager.colors.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .refreshable {
                 // Refresh data if needed
             }
         }
     }
+    
+    private var dashboardHeader: some View {
+        VStack(spacing: BabyOpsTheme.spacingS) {
+            if let baby = logStore.babyProfile {
+                HStack {
+                    VStack(alignment: .leading, spacing: BabyOpsTheme.spacingXS) {
+                        Text(baby.name)
+                            .font(BabyOpsTheme.fontDisplaySmall)
+                            .foregroundColor(themeManager.colors.text)
+                        
+                        Text(baby.ageDescription)
+                            .font(BabyOpsTheme.fontBody)
+                            .foregroundColor(themeManager.colors.text.opacity(0.7))
+                    }
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: BabyOpsTheme.spacingXS) {
+                        Text("Today")
+                            .font(BabyOpsTheme.fontCaption)
+                            .foregroundColor(themeManager.colors.text.opacity(0.6))
+                        
+                        Text(Date().formatted(date: .abbreviated, time: .omitted))
+                            .font(BabyOpsTheme.fontBody)
+                            .fontWeight(.medium)
+                            .foregroundColor(themeManager.colors.primary)
+                    }
+                }
+            }
+        }
+        .padding(.top, BabyOpsTheme.spacingM)
+    }
+    
+    private var statusCards: some View {
+        let todayLog = logStore.todayLog
+        
+        return LazyVGrid(
+            columns: Array(repeating: GridItem(.flexible(), spacing: BabyOpsTheme.spacingS), count: 3),
+            spacing: BabyOpsTheme.spacingS
+        ) {
+            StatusCard(
+                title: "Feedings",
+                value: "\(todayLog.feedingCount)",
+                icon: "drop.fill",
+                color: themeManager.colors.primary,
+                lastEvent: lastFeedingTime()
+            )
+            
+            StatusCard(
+                title: "Sleep",
+                value: formatSleepTime(todayLog.totalSleepMinutes),
+                icon: "moon.fill",
+                color: themeManager.colors.accent,
+                lastEvent: lastSleepTime()
+            )
+            
+            StatusCard(
+                title: "Diapers",
+                value: "\(todayLog.diaperCount)",
+                icon: "figure.2.and.child.holdinghands",
+                color: themeManager.colors.primary.opacity(0.8),
+                lastEvent: lastDiaperTime()
+            )
+        }
+    }
+    
+    private var timelineSection: some View {
+        VStack(alignment: .leading, spacing: BabyOpsTheme.spacingM) {
+            HStack {
+                Text("Today's Timeline")
+                    .font(BabyOpsTheme.fontDisplaySmall)
+                    .foregroundColor(themeManager.colors.text)
+                
+                Spacer()
+                
+                Button(action: {
+                    // TODO: Show filter options
+                }) {
+                    HStack(spacing: BabyOpsTheme.spacingXS) {
+                        Image(systemName: "slider.horizontal.3")
+                        Text("Filter")
+                    }
+                    .font(BabyOpsTheme.fontCaption)
+                    .foregroundColor(themeManager.colors.primary)
+                }
+                .statusPill()
+            }
+            
+            timelineContent
+        }
+    }
+    
+    private var timelineContent: some View {
+        let todayLog = logStore.todayLog
+        
+        return Group {
+            if todayLog.sortedEntries.isEmpty {
+                emptyStateView
+            } else {
+                LazyVStack(spacing: BabyOpsTheme.spacingS) {
+                    ForEach(todayLog.sortedEntries) { entry in
+                        TimelineEntryCard(entry: entry)
+                    }
+                }
+            }
+        }
+    }
+    
+    private var emptyStateView: some View {
+        VStack(spacing: BabyOpsTheme.spacingM) {
+            Image(systemName: "timeline.selection")
+                .font(.system(size: 50))
+                .foregroundColor(themeManager.colors.text.opacity(0.3))
+            
+            VStack(spacing: BabyOpsTheme.spacingS) {
+                Text("No Ops Today")
+                    .font(BabyOpsTheme.fontHeadline)
+                    .foregroundColor(themeManager.colors.text.opacity(0.6))
+                
+                Text("Start tracking your baby's activities")
+                    .font(BabyOpsTheme.fontBody)
+                    .foregroundColor(themeManager.colors.text.opacity(0.5))
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .padding(.vertical, BabyOpsTheme.spacingXL)
+        .babyOpsCard(hasShadow: false)
+    }
+    
+    private var quickActionButton: some View {
+        NavigationLink(destination: RecordView()) {
+            HStack(spacing: BabyOpsTheme.spacingS) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 20, weight: .medium))
+                
+                Text("New Operation")
+                    .font(BabyOpsTheme.fontHeadline)
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(BabyOpsTheme.spacingM)
+            .background(
+                LinearGradient(
+                    colors: [themeManager.colors.primary, themeManager.colors.accent],
+                    startPoint: .leading,
+                    endPoint: .trailing
+                )
+            )
+            .clipShape(RoundedRectangle(cornerRadius: BabyOpsTheme.radiusM))
+            .shadow(
+                color: themeManager.colors.primary.opacity(0.3),
+                radius: 8,
+                x: 0,
+                y: 4
+            )
+        }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func formatSleepTime(_ minutes: Int) -> String {
+        if minutes == 0 { return "0m" }
+        let hours = minutes / 60
+        let mins = minutes % 60
+        if hours > 0 {
+            return mins > 0 ? "\(hours)h \(mins)m" : "\(hours)h"
+        } else {
+            return "\(mins)m"
+        }
+    }
+    
+    private func lastFeedingTime() -> String? {
+        return lastEventTime(for: .feeding)
+    }
+    
+    private func lastSleepTime() -> String? {
+        return lastEventTime(for: .sleep)
+    }
+    
+    private func lastDiaperTime() -> String? {
+        return lastEventTime(for: .diaper)
+    }
+    
+    private func lastEventTime(for type: LogEntryType) -> String? {
+        let todayLog = logStore.todayLog
+        let entries = todayLog.sortedEntries.filter { $0.type == type }
+        guard let lastEntry = entries.first else { return nil }
+        
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: lastEntry.timestamp)
+    }
 }
 
-struct SummaryCard: View {
+struct StatusCard: View {
+    @Environment(ThemeManager.self) private var themeManager
     let title: String
-    let count: Int
-    let unit: String
+    let value: String
     let icon: String
     let color: Color
-    
-    init(title: String, count: Int, unit: String = "", icon: String, color: Color) {
-        self.title = title
-        self.count = count
-        self.unit = unit
-        self.icon = icon
-        self.color = color
-    }
+    let lastEvent: String?
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: BabyOpsTheme.spacingS) {
             Image(systemName: icon)
-                .font(.title2)
+                .font(.system(size: 24, weight: .medium))
                 .foregroundColor(color)
             
-            Text("\(count)\(unit.isEmpty ? "" : " " + unit)")
-                .font(.title3)
-                .fontWeight(.semibold)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
+            VStack(spacing: BabyOpsTheme.spacingXS) {
+                Text(value)
+                    .font(BabyOpsTheme.fontDisplaySmall)
+                    .fontWeight(.bold)
+                    .foregroundColor(themeManager.colors.text)
+                
+                Text(title)
+                    .font(BabyOpsTheme.fontCaption)
+                    .foregroundColor(themeManager.colors.text.opacity(0.7))
+                
+                if let lastEvent = lastEvent {
+                    Text("Last: \(lastEvent)")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(color.opacity(0.8))
+                        .statusPill()
+                }
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(BabyOpsTheme.spacingM)
+        .babyOpsCard()
     }
 }
 
-struct LogEntryRow: View {
+struct TimelineEntryCard: View {
+    @Environment(ThemeManager.self) private var themeManager
     let entry: LogEntry
     
     var body: some View {
-        HStack(spacing: 12) {
-            // Time
+        HStack(spacing: BabyOpsTheme.spacingM) {
+            // Timeline indicator
             VStack {
-                Text(entry.timeString)
-                    .font(.caption)
-                    .fontWeight(.medium)
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 50)
-            
-            // Icon
-            Image(systemName: entry.type.icon)
-                .font(.title3)
-                .foregroundColor(colorForType(entry.type))
-                .frame(width: 30)
-            
-            // Details
-            VStack(alignment: .leading, spacing: 4) {
-                Text(entry.type.displayName)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                Circle()
+                    .fill(colorForType(entry.type))
+                    .frame(width: 12, height: 12)
                 
-                Text(entry.displaySummary)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                Rectangle()
+                    .fill(themeManager.colors.subtle)
+                    .frame(width: 2, height: 30)
+            }
+            
+            // Content
+            VStack(alignment: .leading, spacing: BabyOpsTheme.spacingXS) {
+                HStack {
+                    HStack(spacing: BabyOpsTheme.spacingXS) {
+                        Image(systemName: entry.type.icon)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(colorForType(entry.type))
+                        
+                        Text(entry.type.displayName)
+                            .font(BabyOpsTheme.fontHeadline)
+                            .foregroundColor(themeManager.colors.text)
+                    }
+                    
+                    Spacer()
+                    
+                    Text(entry.timeString)
+                        .font(BabyOpsTheme.fontCaption)
+                        .foregroundColor(themeManager.colors.text.opacity(0.6))
+                        .statusPill()
+                }
+                
+                if !entry.displaySummary.isEmpty {
+                    Text(entry.displaySummary)
+                        .font(BabyOpsTheme.fontBody)
+                        .foregroundColor(themeManager.colors.text.opacity(0.8))
+                }
                 
                 if !entry.notes.isEmpty {
                     Text(entry.notes)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
+                        .font(BabyOpsTheme.fontBody)
+                        .foregroundColor(themeManager.colors.text.opacity(0.6))
                         .italic()
                 }
             }
             
             Spacer()
         }
-        .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(10)
-        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .padding(BabyOpsTheme.spacingM)
+        .babyOpsCard()
     }
     
     private func colorForType(_ type: LogEntryType) -> Color {
         switch type {
-        case .feeding: return .blue
-        case .sleep: return .purple
-        case .diaper: return .green
-        case .note: return .gray
+        case .feeding: return themeManager.colors.primary
+        case .sleep: return themeManager.colors.accent
+        case .diaper: return themeManager.colors.primary.opacity(0.8)
+        case .note: return themeManager.colors.text.opacity(0.6)
         }
     }
 }
@@ -207,4 +333,5 @@ struct LogEntryRow: View {
 #Preview {
     TodayView()
         .environment(LogStore())
+        .environment(ThemeManager.shared)
 }

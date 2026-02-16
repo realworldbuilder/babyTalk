@@ -1,29 +1,32 @@
+// This file is deprecated and replaced by ThemeManager.swift
+// Keeping for compatibility during transition
 import SwiftUI
 
+// Legacy theme - will be removed once all views are migrated to BabyOps theme
 enum Theme {
-    // MARK: - Backgrounds
+    // MARK: - Backgrounds (deprecated - use ThemeManager)
     static let background = Color.black
     static let cardBackground = Color(white: 0.11)
 
-    // MARK: - Accent
+    // MARK: - Accent (deprecated - use ThemeManager)
     static let accent = Color.green
     static let accentSubtle = Color.green.opacity(0.15)
 
-    // MARK: - Text
+    // MARK: - Text (deprecated - use ThemeManager)
     static let textPrimary = Color.white
     static let textSecondary = Color.white.opacity(0.55)
     static let textTertiary = Color.white.opacity(0.35)
 
-    // MARK: - Divider
+    // MARK: - Divider (deprecated - use ThemeManager)
     static let divider = Color.white.opacity(0.06)
 
-    // MARK: - Corner Radii
+    // MARK: - Corner Radii (deprecated - use BabyOpsTheme)
     static let radiusSmall: CGFloat = 8
     static let radiusMedium: CGFloat = 12
     static let radiusLarge: CGFloat = 16
 }
 
-// MARK: - Theme Card Modifier
+// MARK: - Legacy Theme Card Modifier (deprecated - use babyOpsCard)
 
 struct ThemeCardModifier: ViewModifier {
     var cornerRadius: CGFloat = Theme.radiusMedium

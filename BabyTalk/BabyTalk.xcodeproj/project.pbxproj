@@ -46,6 +46,8 @@
 		A1000037 /* ChatModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000037 /* ChatModels.swift */; };
 		A1000038 /* StoryReadTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000038 /* StoryReadTracker.swift */; };
 		A1000039 /* ShareSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000039 /* ShareSheetView.swift */; };
+		A1000040 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000040 /* ThemeManager.swift */; };
+		A1000041 /* ThemePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000041 /* ThemePickerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -88,6 +90,8 @@
 		B1000037 /* ChatModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatModels.swift; sourceTree = "<group>"; };
 		B1000038 /* StoryReadTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryReadTracker.swift; sourceTree = "<group>"; };
 		B1000039 /* ShareSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheetView.swift; sourceTree = "<group>"; };
+		B1000040 /* ThemeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemeManager.swift; sourceTree = "<group>"; };
+		B1000041 /* ThemePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThemePickerView.swift; sourceTree = "<group>"; };
 		C1000001 /* BabyTalk.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BabyTalk.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -141,6 +145,7 @@
 				B1000003 /* DailyLog.swift */,
 				B1000004 /* LogEntry.swift */,
 				B1000037 /* ChatModels.swift */,
+				B1000040 /* ThemeManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -182,6 +187,7 @@
 				B1000039 /* ShareSheetView.swift */,
 				B1000024 /* StoryCarouselView.swift */,
 				B1000025 /* Theme.swift */,
+				B1000041 /* ThemePickerView.swift */,
 				B1000026 /* TodayView.swift */,
 				B1000027 /* WorkoutDetailView.swift */,
 			);
@@ -303,6 +309,8 @@
 				A1000037 /* ChatModels.swift in Sources */,
 				A1000038 /* StoryReadTracker.swift in Sources */,
 				A1000039 /* ShareSheetView.swift in Sources */,
+				A1000040 /* ThemeManager.swift in Sources */,
+				A1000041 /* ThemePickerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -439,10 +447,10 @@
 				CURRENT_PROJECT_VERSION = 17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "";
-				INFOPLIST_KEY_CFBundleDisplayName = "Baby Talk";
+				INFOPLIST_KEY_CFBundleDisplayName = "BabyOps";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Baby Talk needs microphone access to record voice notes for baby tracking.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Baby Talk saves your baby tracking data to Apple Health.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "BabyOps needs microphone access to record voice notes for baby tracking.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "BabyOps saves your baby tracking data to Apple Health.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to record voice notes for baby tracking.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -457,7 +465,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whussey.babytalk;
-				PRODUCT_NAME = "Baby Talk";
+				PRODUCT_NAME = "BabyOps";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -477,10 +485,10 @@
 				CURRENT_PROJECT_VERSION = 17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "";
-				INFOPLIST_KEY_CFBundleDisplayName = "Baby Talk";
+				INFOPLIST_KEY_CFBundleDisplayName = "BabyOps";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "Baby Talk needs microphone access to record voice notes for baby tracking.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Baby Talk saves your baby tracking data to Apple Health.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "BabyOps needs microphone access to record voice notes for baby tracking.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "BabyOps saves your baby tracking data to Apple Health.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to record voice notes for baby tracking.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -495,7 +503,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.whussey.babytalk;
-				PRODUCT_NAME = "Baby Talk";
+				PRODUCT_NAME = "BabyOps";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
