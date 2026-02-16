@@ -11,7 +11,7 @@ final class ChatService: ObservableObject {
     private let endpoint = URL(string: "https://api.openai.com/v1/chat/completions")!
     
     func sendMessage(_ text: String, babyProfile: BabyProfile?, recentLogs: [LogEntry]) async {
-        let userMessage = ChatMessage(role: .user, content: text)
+        let userMessage = ChatMessage(text: text, isFromUser: true)
         messages.append(userMessage)
         
         isProcessing = true
@@ -19,18 +19,18 @@ final class ChatService: ObservableObject {
         
         let apiKey = APIKeyProvider.resolvedKey
         guard !apiKey.isEmpty else {
-            let errorMessage = ChatMessage(role: .assistant, content: "Error: No API key available. Please check your settings.")
+            let errorMessage = ChatMessage(text: "Error: No API key available. Please check your settings.", isFromUser: false)
             messages.append(errorMessage)
             return
         }
         
         do {
             let response = try await getChatResponse(text, babyProfile: babyProfile, recentLogs: recentLogs)
-            let assistantMessage = ChatMessage(role: .assistant, content: response)
+            let assistantMessage = ChatMessage(text: response, isFromUser: false)
             messages.append(assistantMessage)
         } catch {
             Self.logger.error("Chat error: \(error)")
-            let errorMessage = ChatMessage(role: .assistant, content: "Sorry, I encountered an error. Please try again.")
+            let errorMessage = ChatMessage(text: "Sorry, I encountered an error. Please try again.", isFromUser: false)
             messages.append(errorMessage)
         }
     }
@@ -80,22 +80,6 @@ final class ChatService: ObservableObject {
     func clearMessages() {
         messages.removeAll()
     }
-}
-
-struct ChatMessage: Identifiable, Equatable {
-    let id = UUID()
-    let role: ChatRole
-    let content: String
-    let timestamp = Date()
-    
-    var isUser: Bool {
-        role == .user
-    }
-}
-
-enum ChatRole {
-    case user
-    case assistant
 }
 
 enum ChatError: LocalizedError {

@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "T1000001"
-               BuildableName = "Momentary.app"
-               BlueprintName = "Momentary"
-               ReferencedContainer = "container:Momentary.xcodeproj">
+               BuildableName = "BabyTalk.app"
+               BlueprintName = "BabyTalk"
+               ReferencedContainer = "container:BabyTalk.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -44,9 +44,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "T1000001"
-            BuildableName = "Momentary.app"
-            BlueprintName = "Momentary"
-            ReferencedContainer = "container:Momentary.xcodeproj">
+            BuildableName = "BabyTalk.app"
+            BlueprintName = "BabyTalk"
+            ReferencedContainer = "container:BabyTalk.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -61,9 +61,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "T1000001"
-            BuildableName = "Momentary.app"
-            BlueprintName = "Momentary"
-            ReferencedContainer = "container:Momentary.xcodeproj">
+            BuildableName = "BabyTalk.app"
+            BlueprintName = "BabyTalk"
+            ReferencedContainer = "container:BabyTalk.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -169,50 +169,7 @@ struct ChatView: View {
     }
 }
 
-struct ChatMessageView: View {
-    let message: ChatMessage
-    
-    var body: some View {
-        HStack {
-            if message.isUser {
-                Spacer()
-                
-                Text(message.content)
-                    .font(.body)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(16, corners: [.topLeft, .topRight, .bottomLeft])
-                    .frame(maxWidth: UIScreen.main.bounds.width * 0.75, alignment: .trailing)
-            } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Image(systemName: "brain.head.profile")
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                        Text("Baby Talk AI")
-                            .font(.caption)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.blue)
-                        Spacer()
-                    }
-                    
-                    Text(message.content)
-                        .font(.body)
-                        .foregroundColor(.primary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                .padding()
-                .background(Color(.systemGray6))
-                .cornerRadius(16, corners: [.topLeft, .topRight, .bottomRight])
-                .frame(maxWidth: UIScreen.main.bounds.width * 0.85, alignment: .leading)
-                
-                Spacer()
-            }
-        }
-        .padding(.horizontal)
-    }
-}
+// ChatMessageView is defined in ChatMessageView.swift
 
 struct QuickQuestionButton: View {
     let text: String

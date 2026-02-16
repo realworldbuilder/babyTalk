@@ -184,7 +184,7 @@ struct WorkoutDetailView: View {
             .themeCard()
         }
 
-        if aiPipeline.state == .queued {
+        if aiPipeline.state == .idle {
             HStack(spacing: 10) {
                 Image(systemName: "clock.fill")
                     .foregroundStyle(.orange)

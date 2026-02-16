@@ -11,7 +11,7 @@ struct ChatMessageView: View {
                 TypingIndicator()
                 Spacer()
             }
-        } else if message.role == .user {
+        } else if message.isFromUser {
             UserBubble(message: message)
         } else {
             AssistantMessage(message: message, onAction: onAction, onWorkoutTap: onWorkoutTap)
@@ -27,13 +27,25 @@ private struct UserBubble: View {
     var body: some View {
         HStack {
             Spacer()
-            Text(message.blocks.first?.payload.text ?? "")
+            Text(getMessageText(from: message))
                 .font(.body)
                 .foregroundColor(Theme.textPrimary)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 10)
                 .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: Theme.radiusMedium))
         }
+    }
+    
+    private func getMessageText(from message: ChatMessage) -> String {
+        if let firstBlock = message.blocks.first {
+            switch firstBlock.payload {
+            case .text(let text):
+                return text
+            default:
+                break
+            }
+        }
+        return message.text
     }
 }
 

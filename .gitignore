@@ -1,0 +1,4 @@
+build/
+*.pbxproj.backup
+*_old.*
+*_broken.*

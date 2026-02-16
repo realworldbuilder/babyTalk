@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ActiveWorkoutTab: View {
     @Environment(WorkoutManager.self) private var workoutManager
-    @StateObject private var recorder = PhoneAudioRecorderService()
+    @State private var recorder = PhoneAudioRecorderService()
     @State private var showMicPermissionDenied = false
     @State private var showEndConfirmation = false
 

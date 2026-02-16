@@ -1,5 +1,4 @@
 import SwiftUI
-import Charts
 
 struct ChatBlockView: View {
     let block: ChatBlock
@@ -10,20 +9,18 @@ struct ChatBlockView: View {
         switch block.type {
         case .text:
             TextBlockView(payload: block.payload)
-        case .workoutSummary:
-            WorkoutSummaryBlockView(payload: block.payload, onWorkoutTap: onWorkoutTap)
-        case .exerciseTable:
-            ExerciseTableBlockView(payload: block.payload)
-        case .metricGrid:
-            MetricGridBlockView(payload: block.payload)
+        case .metrics:
+            MetricsBlockView(payload: block.payload)
+        case .insights:
+            InsightsBlockView(payload: block.payload)
+        case .timeline:
+            TimelineBlockView(payload: block.payload)
+        case .recommendations:
+            RecommendationsBlockView(payload: block.payload)
+        case .question:
+            QuestionBlockView(payload: block.payload, onAction: onAction)
         case .chart:
-            ChartBlockView_Inner(payload: block.payload)
-        case .insight:
-            InsightBlockView(payload: block.payload)
-        case .actionButtons:
-            ActionButtonsBlockView(payload: block.payload, onAction: onAction)
-        case .workoutList:
-            WorkoutListBlockView(payload: block.payload, onWorkoutTap: onWorkoutTap)
+            ChartBlockView(payload: block.payload)
         }
     }
 }
@@ -34,327 +31,225 @@ private struct TextBlockView: View {
     let payload: ChatBlockPayload
 
     var body: some View {
-        Text(payload.text ?? "")
-            .foregroundColor(Theme.textPrimary)
-            .font(.body)
-    }
-}
-
-// MARK: - Workout Summary Block
-
-private struct WorkoutSummaryBlockView: View {
-    let payload: ChatBlockPayload
-    var onWorkoutTap: ((UUID) -> Void)?
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            if let date = payload.date {
-                Text(date)
-                    .font(.headline)
-                    .foregroundColor(Theme.textPrimary)
-            }
-
-            HStack(spacing: 12) {
-                if let duration = payload.duration {
-                    statPill(icon: "clock", value: duration)
-                }
-                if let count = payload.exerciseCount {
-                    statPill(icon: "dumbbell.fill", value: "\(count)")
-                }
-                if let sets = payload.totalSets {
-                    statPill(icon: "repeat", value: "\(sets)")
-                }
-            }
-
-            if let volume = payload.totalVolume, volume > 0 {
-                Text(formatVolume(volume))
-                    .font(.title3)
-                    .fontWeight(.bold)
-                    .foregroundColor(Theme.accent)
-            }
-
-            if let names = payload.exerciseNames, !names.isEmpty {
-                Text(names.joined(separator: " \u{2022} "))
-                    .font(.caption)
-                    .foregroundColor(Theme.textSecondary)
-            }
-        }
-        .themeCard()
-        .onTapGesture {
-            if let idStr = payload.workoutId, let uuid = UUID(uuidString: idStr) {
-                onWorkoutTap?(uuid)
-            }
-        }
-    }
-
-    private func statPill(icon: String, value: String) -> some View {
-        HStack(spacing: 4) {
-            Image(systemName: icon)
-                .font(.caption2)
-                .foregroundColor(Theme.textSecondary)
-            Text(value)
-                .font(.caption)
+        switch payload {
+        case .text(let text):
+            Text(text)
+                .font(.body)
                 .foregroundColor(Theme.textPrimary)
+                .multilineTextAlignment(.leading)
+        default:
+            Text("Unsupported content")
+                .font(.body)
+                .foregroundColor(.secondary)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .background(Color.white.opacity(0.05), in: Capsule())
-    }
-
-    private func formatVolume(_ volume: Double) -> String {
-        if volume >= 1000 {
-            return String(format: "%.1fK lbs", volume / 1000)
-        }
-        return String(format: "%.0f lbs", volume)
     }
 }
 
-// MARK: - Exercise Table Block
+// MARK: - Metrics Block
 
-private struct ExerciseTableBlockView: View {
+private struct MetricsBlockView: View {
     let payload: ChatBlockPayload
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let name = payload.exerciseName {
-                Text(name)
-                    .font(.headline)
-                    .foregroundColor(Theme.textPrimary)
-            }
-
-            // Header
-            HStack {
-                Text("Set")
-                    .frame(width: 36, alignment: .leading)
-                Text("Reps")
-                    .frame(width: 44, alignment: .center)
-                Text("Weight")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-            .font(.caption)
-            .fontWeight(.semibold)
-            .foregroundColor(Theme.textSecondary)
-
-            Divider().overlay(Theme.divider)
-
-            if let sets = payload.sets {
-                ForEach(Array(sets.enumerated()), id: \.offset) { _, set in
-                    HStack {
-                        Text("\(set.setNumber ?? 0)")
-                            .frame(width: 36, alignment: .leading)
-                        Text(set.reps.map { "\($0)" } ?? "-")
-                            .frame(width: 44, alignment: .center)
-                        Text(formatWeight(set.weight, unit: set.unit))
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                    }
-                    .font(.callout)
-                    .foregroundColor(Theme.textPrimary)
-                }
-            }
-        }
-        .themeCard()
-    }
-
-    private func formatWeight(_ weight: Double?, unit: String?) -> String {
-        guard let w = weight else { return "-" }
-        return "\(Int(w)) \(unit ?? "lbs")"
-    }
-}
-
-// MARK: - Metric Grid Block
-
-private struct MetricGridBlockView: View {
-    let payload: ChatBlockPayload
-
-    private let columns = [
-        GridItem(.flexible(), spacing: 12),
-        GridItem(.flexible(), spacing: 12)
-    ]
-
-    var body: some View {
-        if let metrics = payload.metrics, !metrics.isEmpty {
-            LazyVGrid(columns: columns, spacing: 12) {
+        switch payload {
+        case .metrics(let metrics):
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                 ForEach(metrics) { metric in
-                    ChatMetricCard(metric: metric)
+                    MetricCardView(metric: metric)
                 }
             }
+        default:
+            Text("No metrics available")
+                .font(.body)
+                .foregroundColor(.secondary)
         }
     }
 }
 
-private struct ChatMetricCard: View {
+private struct MetricCardView: View {
     let metric: ChatMetric
-
+    
     var body: some View {
-        VStack(spacing: 6) {
-            if let icon = metric.icon {
-                Image(systemName: icon)
-                    .font(.title3)
-                    .foregroundColor(Theme.accent)
-            }
-            if let value = metric.value {
-                Text(value)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(Theme.textPrimary)
-            }
-            if let title = metric.title {
-                Text(title)
+        VStack(alignment: .leading, spacing: 4) {
+            Text(metric.name)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text(metric.value)
+                .font(.title2)
+                .fontWeight(.semibold)
+            if let unit = metric.unit {
+                Text(unit)
                     .font(.caption)
-                    .foregroundColor(Theme.textSecondary)
-            }
-            if let subtitle = metric.subtitle {
-                Text(subtitle)
-                    .font(.caption2)
-                    .foregroundColor(Theme.textTertiary)
+                    .foregroundColor(.secondary)
             }
         }
-        .frame(maxWidth: .infinity)
-        .themeCard()
+        .padding(12)
+        .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+// MARK: - Insights Block
+
+private struct InsightsBlockView: View {
+    let payload: ChatBlockPayload
+
+    var body: some View {
+        switch payload {
+        case .insights(let insights):
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(insights.enumerated()), id: \.offset) { _, insight in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "lightbulb.fill")
+                            .foregroundColor(.yellow)
+                            .font(.caption)
+                        Text(insight)
+                            .font(.body)
+                            .foregroundColor(Theme.textPrimary)
+                    }
+                }
+            }
+        default:
+            Text("No insights available")
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+// MARK: - Timeline Block
+
+private struct TimelineBlockView: View {
+    let payload: ChatBlockPayload
+
+    var body: some View {
+        switch payload {
+        case .timeline(let events):
+            VStack(alignment: .leading, spacing: 12) {
+                ForEach(events) { event in
+                    HStack(alignment: .top, spacing: 12) {
+                        Circle()
+                            .fill(Theme.accent)
+                            .frame(width: 8, height: 8)
+                            .offset(y: 6)
+                        
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(event.title)
+                                .font(.body)
+                                .fontWeight(.medium)
+                            if let description = event.description {
+                                Text(description)
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Text(event.time, style: .time)
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        
+                        Spacer()
+                    }
+                }
+            }
+        default:
+            Text("No timeline available")
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+// MARK: - Recommendations Block
+
+private struct RecommendationsBlockView: View {
+    let payload: ChatBlockPayload
+
+    var body: some View {
+        switch payload {
+        case .recommendations(let recommendations):
+            VStack(alignment: .leading, spacing: 8) {
+                ForEach(Array(recommendations.enumerated()), id: \.offset) { _, recommendation in
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.orange)
+                            .font(.caption)
+                        Text(recommendation)
+                            .font(.body)
+                            .foregroundColor(Theme.textPrimary)
+                    }
+                }
+            }
+        default:
+            Text("No recommendations available")
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
+    }
+}
+
+// MARK: - Question Block
+
+private struct QuestionBlockView: View {
+    let payload: ChatBlockPayload
+    var onAction: ((ChatAction) -> Void)?
+
+    var body: some View {
+        switch payload {
+        case .question(let question, let options):
+            VStack(alignment: .leading, spacing: 12) {
+                Text(question)
+                    .font(.body)
+                    .foregroundColor(Theme.textPrimary)
+                
+                LazyVGrid(columns: [GridItem(.flexible())], spacing: 8) {
+                    ForEach(options, id: \.self) { option in
+                        Button(action: {
+                            onAction?(.selectOption(option))
+                        }) {
+                            Text(option)
+                                .font(.body)
+                                .foregroundColor(Theme.accent)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Theme.cardBackground, in: RoundedRectangle(cornerRadius: 8))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+        default:
+            Text("Invalid question format")
+                .font(.body)
+                .foregroundColor(.secondary)
+        }
     }
 }
 
 // MARK: - Chart Block
 
-private struct ChartBlockView_Inner: View {
+private struct ChartBlockView: View {
     let payload: ChatBlockPayload
 
     var body: some View {
-        let dataPoints = (payload.dataPoints ?? []).map { $0.toChartDataPoint() }
-        let chartType = payload.chartType ?? "volumeOverTime"
-
-        switch chartType {
-        case "progressTrend":
-            ProgressTrendChart(dataPoints: dataPoints)
-        case "prComparison":
-            PRComparisonChart(dataPoints: dataPoints)
+        switch payload {
+        case .chart(let chart):
+            VStack(alignment: .leading, spacing: 12) {
+                Text(chart.title)
+                    .font(.headline)
+                    .foregroundColor(Theme.textPrimary)
+                
+                // Simple placeholder for chart
+                Rectangle()
+                    .fill(Theme.cardBackground)
+                    .frame(height: 200)
+                    .overlay(
+                        Text("Chart: \(chart.title)")
+                            .foregroundColor(.secondary)
+                    )
+            }
         default:
-            VolumeOverTimeChart(dataPoints: dataPoints)
+            Text("No chart data available")
+                .font(.body)
+                .foregroundColor(.secondary)
         }
-    }
-}
-
-// MARK: - Insight Block
-
-private struct InsightBlockView: View {
-    let payload: ChatBlockPayload
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                if let title = payload.title {
-                    Text(title)
-                        .font(.headline)
-                        .foregroundColor(Theme.textPrimary)
-                }
-
-                Spacer()
-
-                if let typeStr = payload.insightType,
-                   let type = InsightType(rawValue: typeStr) {
-                    Text(type.displayName)
-                        .font(.caption2)
-                        .fontWeight(.medium)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(type.color.opacity(0.2), in: Capsule())
-                        .foregroundColor(type.color)
-                }
-            }
-
-            if let body = payload.body {
-                Text(body)
-                    .font(.subheadline)
-                    .foregroundColor(Theme.textSecondary)
-            }
-        }
-        .themeCard()
-    }
-}
-
-// MARK: - Action Buttons Block
-
-private struct ActionButtonsBlockView: View {
-    let payload: ChatBlockPayload
-    var onAction: ((ChatAction) -> Void)?
-
-    var body: some View {
-        if let actions = payload.actions, !actions.isEmpty {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(actions) { action in
-                        Button {
-                            onAction?(action)
-                        } label: {
-                            Text(action.label)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(Theme.accent)
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 8)
-                                .background(Theme.accentSubtle, in: Capsule())
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-// MARK: - Workout List Block
-
-private struct WorkoutListBlockView: View {
-    let payload: ChatBlockPayload
-    var onWorkoutTap: ((UUID) -> Void)?
-
-    var body: some View {
-        if let workouts = payload.workouts, !workouts.isEmpty {
-            VStack(spacing: 8) {
-                ForEach(workouts) { workout in
-                    Button {
-                        if let idStr = workout.workoutId, let uuid = UUID(uuidString: idStr) {
-                            onWorkoutTap?(uuid)
-                        }
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                if let date = workout.date {
-                                    Text(date)
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(Theme.textPrimary)
-                                }
-                                if let summary = workout.summary {
-                                    Text(summary)
-                                        .font(.caption)
-                                        .foregroundColor(Theme.textSecondary)
-                                }
-                            }
-
-                            Spacer()
-
-                            if let volume = workout.volume, volume > 0 {
-                                Text(formatVolume(volume))
-                                    .font(.caption)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(Theme.accent)
-                            }
-
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(Theme.textTertiary)
-                        }
-                        .themeCard()
-                    }
-                }
-            }
-        }
-    }
-
-    private func formatVolume(_ volume: Double) -> String {
-        if volume >= 1000 {
-            return String(format: "%.1fK", volume / 1000)
-        }
-        return String(format: "%.0f lbs", volume)
     }
 }
