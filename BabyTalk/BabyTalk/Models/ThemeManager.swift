@@ -6,13 +6,11 @@ import Foundation
 enum BabyThemeType: String, CaseIterable, Codable {
     case boy = "boy"
     case girl = "girl"
-    case neutral = "neutral"
     
     var displayName: String {
         switch self {
         case .boy: return "Boy"
         case .girl: return "Girl" 
-        case .neutral: return "Neutral"
         }
     }
     
@@ -36,15 +34,6 @@ enum BabyThemeType: String, CaseIterable, Codable {
                 text: Color(hex: "2C1A21"),
                 subtle: Color(hex: "FDE8EF")
             )
-        case .neutral:
-            return ThemeColors(
-                primary: Color(hex: "7BA37E"),
-                background: Color(hex: "F7F5F0"),
-                surface: Color(hex: "FFFFFF"),
-                accent: Color(hex: "8BA888"),
-                text: Color(hex: "2A2A25"),
-                subtle: Color(hex: "EEF0E8")
-            )
         }
     }
     
@@ -52,7 +41,6 @@ enum BabyThemeType: String, CaseIterable, Codable {
         switch self {
         case .boy: return "figure.child"
         case .girl: return "figure.dress.line.vertical.figure"
-        case .neutral: return "heart.fill"
         }
     }
 }
@@ -96,7 +84,7 @@ class ThemeManager {
            let theme = BabyThemeType(rawValue: themeString) {
             selectedTheme = theme
         } else {
-            selectedTheme = .neutral // Default
+            selectedTheme = .boy // Default
         }
     }
     

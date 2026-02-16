@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ThemePickerView: View {
     @Environment(ThemeManager.self) private var themeManager
-    @State private var selectedTheme: BabyThemeType = .neutral
+    @State private var selectedTheme: BabyThemeType = .boy
     let onComplete: () -> Void
     
     var body: some View {
@@ -157,8 +157,6 @@ struct ThemeOptionCard: View {
             return "Cool blues for a calming, confident feel"
         case .girl:
             return "Warm roses for a gentle, loving atmosphere"
-        case .neutral:
-            return "Natural sage tones for balanced harmony"
         }
     }
 }
