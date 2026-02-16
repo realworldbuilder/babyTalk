@@ -10,6 +10,7 @@ struct MainTabView: View {
         Group {
             if logStore.babyProfile == nil || !themeManager.hasSelectedTheme {
                 SetupView()
+                    .transition(.opacity)
             } else {
                 TabView(selection: $selectedTab) {
                     TodayView()
@@ -211,7 +212,10 @@ struct SetupView: View {
     }
     
     private func createProfile() {
-        logStore.createBabyProfile(name: babyName, birthDate: birthDate)
+        guard !babyName.isEmpty else { return }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            logStore.createBabyProfile(name: babyName, birthDate: birthDate)
+        }
     }
 }
 
