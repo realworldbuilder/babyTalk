@@ -20,6 +20,9 @@ final class TranscriptionService: ObservableObject {
 
         do {
             let audioData = try Data(contentsOf: audioURL)
+            guard audioData.count > 100 else {
+                return .failure(TranscriptionError.emptyResult)
+            }
             let boundary = UUID().uuidString
 
             var request = URLRequest(url: endpoint)
@@ -35,8 +38,8 @@ final class TranscriptionService: ObservableObject {
             body.append("whisper-1\r\n".data(using: .utf8)!)
             // file field
             body.append("--\(boundary)\r\n".data(using: .utf8)!)
-            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"audio.m4a\"\r\n".data(using: .utf8)!)
-            body.append("Content-Type: audio/m4a\r\n\r\n".data(using: .utf8)!)
+            body.append("Content-Disposition: form-data; name=\"file\"; filename=\"recording.m4a\"\r\n".data(using: .utf8)!)
+            body.append("Content-Type: audio/mp4\r\n\r\n".data(using: .utf8)!)
             body.append(audioData)
             body.append("\r\n".data(using: .utf8)!)
             body.append("--\(boundary)--\r\n".data(using: .utf8)!)
